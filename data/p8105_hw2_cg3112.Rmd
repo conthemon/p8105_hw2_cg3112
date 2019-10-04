@@ -6,16 +6,17 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-
-getwd()
+library(dbplyr)
+library(readxl)
+setwd("C:/Users/conth/OneDrive/Documents/Data Science/HW2/p8105_hw2_cg3112/data")
 ```
 
 #Problem 1
 ```{r}
-#Reading the file with restrictions
+#Reading the Mr. Trash Wheel sheet with restrictions
 trash <- read_excel("./Trash-Wheel-Collection-Totals-8-6-19.xlsx", col_types = NULL, range = "A2:N408")
 trash <- janitor::clean_names(trash)
-skimr::skim(trash)
+
 
 #Editing the file
 trash <- drop_na(trash, dumpster) %>%
@@ -23,5 +24,39 @@ trash <- drop_na(trash, dumpster) %>%
    mutate(sports_balls = as.integer(sports_balls))
 head(trash)
 
+#Reading the precipitation sheet
+precip_2016 <- read_excel("./Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "2016 Precipitation", skip = 1, col_names = TRUE) %>%
+  janitor::clean_names() %>%
+  drop_na() %>%
+  mutate(year = 2016)
+head(precip_2016)
+precip_2017 <- read_excel("./Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "2017 Precipitation", skip = 1,
+col_names = TRUE) %>%
+  janitor::clean_names() %>%
+  drop_na() %>%
+  mutate(year = 2017)
+head(precip_2017)
+
+precip_2016_2017 <- full_join(x = precip_2017, y = precip_2016) 
+view(precip_2016_2017)
+
+#precip_2016_2017 <- mutate(precip_2016_2017, month = month.name)
+#view(precip_2016_2017)
+
+#NOT WORKING TO GET NAME
+trash2017 = select(trash, year, sports_balls) %>%
+  filter(year == 2017) %>%
+  mutate(sum_2017 = sum(sports_balls))
+
+total_prec_2017 = mutate(precip_2017, sumof = sum(total))
 ```
+#Summary of data
+In the trash data set we have `r nrow(trash)` observations. During the year 2017 there were `r median(trash2017$sum_2017)` sports balls in dumpsters.
+In the precipitation database there was a total of `r median(total_prec_2017$sumof)` precipitation that year.
+
+
+
+
+
+
 
