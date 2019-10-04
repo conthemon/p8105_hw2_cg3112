@@ -1,0 +1,27 @@
+---
+title: "p8105_hw2_cg3112"
+output: github_document
+---
+#Problem 0
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+getwd()
+```
+
+#Problem 1
+```{r}
+#Reading the file with restrictions
+trash <- read_excel("./Trash-Wheel-Collection-Totals-8-6-19.xlsx", col_types = NULL, range = "A2:N408")
+trash <- janitor::clean_names(trash)
+skimr::skim(trash)
+
+#Editing the file
+trash <- drop_na(trash, dumpster) %>%
+   mutate(sports_balls = round(sports_balls, digits = 0)) %>%
+   mutate(sports_balls = as.integer(sports_balls))
+head(trash)
+
+```
+
